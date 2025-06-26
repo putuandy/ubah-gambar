@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useTheme } from '@/components/theme-provider'
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import { Upload, Download, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -44,6 +44,12 @@ function App() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [downloadAllLoading, setDownloadAllLoading] = useState(false);
   const [convertLoading, setConvertLoading] = useState(false);
+
+  useEffect(() => {
+    return () => {
+      convertedFiles.forEach(file => URL.revokeObjectURL(file.url));
+    };
+  }, [convertedFiles]);
 
   const handleDragEnter = useCallback((e: React.DragEvent) => {
     e.preventDefault()
@@ -122,8 +128,12 @@ function App() {
   }, [])
 
   const handleRemoveConvertedFile = useCallback((id: string) => {
-    setConvertedFiles((prev) => prev.filter((file) => file.id !== id))
-  }, [])
+    const fileToRemove = convertedFiles.find((file) => file.id === id);
+    if (fileToRemove) {
+      URL.revokeObjectURL(fileToRemove.url);
+    }
+    setConvertedFiles((prev) => prev.filter((file) => file.id !== id));
+  }, [convertedFiles]);
 
   const handleOutputFormatChange = useCallback((id: string, format: string) => {
     setUploadedFiles((prev) => prev.map((file) => (file.id === id ? { ...file, outputFormat: format } : file)))
@@ -139,7 +149,6 @@ function App() {
     if (uploadedFiles.length === 0) return
 
     setConvertLoading(true)
-    console.log("Converting files...")
     const newConvertedFiles = await Promise.all(
       uploadedFiles.map(async (file) => {
         try {
@@ -171,7 +180,6 @@ function App() {
     setConvertedFiles((prev) => [...prev, ...newConvertedFiles.filter((file) => file !== null)]);
     setUploadedFiles([])
     setConvertLoading(false)
-    console.log("Conversion completed")
     toast.success("Files converted successfully!", {
       description: "You can now download the converted files.",
     });
@@ -182,7 +190,6 @@ function App() {
     anchor.href = url;
     anchor.download = fileName;
     anchor.click();
-    URL.revokeObjectURL(url); // Clean up the object URL
   };
 
   const downloadAllFilesAsZip = async (files: ConvertedFile[]) => {
@@ -225,7 +232,7 @@ function App() {
 
   return (
     <>
-      <main className="flex-1 container mx-auto px-4 py-12 flex flex-col items-center">
+      <main className="flex-1 container mx-auto px-4 py-12 pb-24 flex flex-col items-center">
         <h1 className="text-4xl font-bold mb-2">Convert Images Effortlessly!</h1>
         <p className={`${theme === "dark" ? "text-gray-400" : "text-gray-600"} mb-10`}>
           Convert images to any format instantly and easily!
@@ -390,19 +397,21 @@ function App() {
                 <span className={`${theme === "dark" ? "text-gray-400" : "text-gray-500"} text-sm`}>
                   Total space saved: {formatFileSize(totalSaved)}
                 </span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => downloadAllFilesAsZip(convertedFiles)}
-                  className={`${
-                    theme === "dark"
-                      ? "bg-gray-800 text-gray-200 border-gray-700 hover:bg-gray-700"
-                      : "bg-gray-100 text-gray-800 border-gray-300 hover:bg-gray-200"
-                  } ${downloadAllLoading ? "cursor-progress" : "cursor-pointer"}`}
-                >
-                  <Download size={16} className="mr-2" />
-                  {downloadAllLoading ? "Downloading...." : "Download All as ZIP"}
-                </Button>
+                {convertedFiles.length > 1 && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => downloadAllFilesAsZip(convertedFiles)}
+                    className={`${
+                      theme === "dark"
+                        ? "bg-gray-800 text-gray-200 border-gray-700 hover:bg-gray-700"
+                        : "bg-gray-100 text-gray-800 border-gray-300 hover:bg-gray-200"
+                    } ${downloadAllLoading ? "cursor-progress" : "cursor-pointer"}`}
+                  >
+                    <Download size={16} className="mr-2" />
+                    {downloadAllLoading ? "Downloading...." : "Download All as ZIP"}
+                  </Button>
+                )}
               </div>
             </div>
 

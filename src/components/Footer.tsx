@@ -7,13 +7,13 @@ export default function Footer() {
             <div className="container mx-auto px-4">
                 <div className="flex flex-col md:flex-row justify-center md:justify-between items-center text-sm text-gray-400">
                     <div className="flex gap-6 mb-4 md:mb-0">
-                    <a href="#" className={`${theme === "dark" ? "hover:text-white" : "hover:text-gray-900"}`}>
+                    <a href="/how-to-use" className={`${theme === "dark" ? "hover:text-white" : "hover:text-gray-900"}`}>
                         How to use?
                     </a>
-                    <a href="#" className={`${theme === "dark" ? "hover:text-white" : "hover:text-gray-900"}`}>
+                    <a href="/terms-and-conditions" className={`${theme === "dark" ? "hover:text-white" : "hover:text-gray-900"}`}>
                         Terms & Conditions
                     </a>
-                    <a href="#" className={`${theme === "dark" ? "hover:text-white" : "hover:text-gray-900"}`}>
+                    <a href="/privacy-policy" className={`${theme === "dark" ? "hover:text-white" : "hover:text-gray-900"}`}>
                         Privacy Policy
                     </a>
                     {/* <a href="#" className={`${theme === "dark" ? "hover:text-white" : "hover:text-gray-900"}`}>

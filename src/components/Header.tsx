@@ -7,7 +7,7 @@ export default function Header() {
   return (
     <header className={`border-b ${theme === "dark" ? "border-gray-800" : "border-border"}`}>
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-2">
+          <a href="/" className="flex items-center gap-2">
             <img
               src="/placeholder.svg?height=32&width=32"
               width={32}
@@ -16,7 +16,7 @@ export default function Header() {
               className="rounded-full"
             />
             <h1 className="text-xl font-bold">Ubah Gambar</h1>
-          </div>
+          </a>
           <button
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             className={`p-2 rounded-full ${theme === "dark" ? "bg-gray-800 hover:bg-gray-700" : "bg-gray-200 hover:bg-gray-300"} transition-colors`}
